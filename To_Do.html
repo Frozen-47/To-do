@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Work Planner</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #e3eafc 0%, #f5f7fa 100%);
+      --text-color: #000;
+      --container-bg: #fff;
+      --container-border: #e3eafc;
+      --input-bg: #f7fafc;
+      --input-border: #b0bec5;
+      --task-bg: #f5f7fa;
+      --task-border: #e3eafc;
+      --priority-low: #1976d2;
+      --priority-medium: #ffc107;
+      --priority-medium-text: #333;
+      --priority-high: #d32f2f;
+      --due-date-color: #607d8b;
+      --button-bg: linear-gradient(135deg, #1976d2 60%, #42a5f5 100%);
+      --button-hover-bg: linear-gradient(135deg, #1565c0 60%, #1976d2 100%);
+      --clear-btn-bg: linear-gradient(90deg, #d32f2f 60%, #f44336 100%);
+      --dark-toggle-bg: #607d8b;
+      --dark-toggle-color: #fff;
+    }
+
+    [data-theme="dark"] {
+      --bg-gradient: linear-gradient(135deg, #1e1e2f, #2c2c3a);
+      --text-color: #f0f0f0;
+      --container-bg: #2e2e3e;
+      --container-border: #444;
+      --input-bg: #3a3a4a;
+      --input-border: #666;
+      --task-bg: #3a3a4a;
+      --task-border: #555;
+      --due-date-color: #90a4ae;
+      --dark-toggle-bg: #90a4ae;
+      --dark-toggle-color: #222;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-color);
+      font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      transition: background 0.3s, color 0.3s;
+      padding: 20px;
+    }
+
+    .todo-container {
+      background: var(--container-bg);
+      padding: 2.5rem 2rem;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(60,72,88,0.15);
+      width: 100%;
+      max-width: 460px;
+      text-align: center;
+      border: 1px solid var(--container-border);
+      transition: background 0.3s, border 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .todo-container h1 {
+      margin-bottom: 20px;
+      color: #1a237e;
+    }
+
+    .input-section,
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .input-section input,
+    .input-section select,
+    .filters select {
+      flex: 1;
+      padding: 10px;
+      border: 1.5px solid var(--input-border);
+      border-radius: 8px;
+      font-size: 1rem;
+      background: var(--input-bg);
+      color: var(--text-color);
+      transition: border 0.2s, background 0.3s, color 0.3s;
+    }
+
+    .input-section button {
+      width: 48px;
+      height: 44px;
+      background: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s;
+      flex-shrink: 0;
+    }
+
+    .input-section button:hover {
+      background: var(--button-hover-bg);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 12px 0;
+      flex-grow: 1;
+      overflow-y: auto;
+      max-height: 320px;
+    }
+
+    li {
+      background: var(--task-bg);
+      padding: 12px 16px;
+      margin: 10px 0;
+      border-radius: 9px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--task-border);
+      transition: background 0.3s, border 0.3s;
+      cursor: pointer;
+    }
+
+    li.done {
+      text-decoration: line-through;
+      color: #90a4ae;
+      background: #eceff1;
+      cursor: default;
+    }
+
+    .task-info {
+      flex: 1;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .priority {
+      font-size: 0.85em;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-left: 7px;
+      color: #fff;
+      display: inline-block;
+      letter-spacing: 0.5px;
+    }
+
+    .priority.low {
+      background: var(--priority-low);
+    }
+
+    .priority.medium {
+      background: var(--priority-medium);
+      color: var(--priority-medium-text);
+    }
+
+    .priority.high {
+      background: var(--priority-high);
+    }
+
+    .due-date {
+      font-size: 0.85em;
+      color: var(--due-date-color);
+    }
+
+    li button {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      margin-left: 6px;
+      flex-shrink: 0;
+    }
+
+    li button.edit-btn {
+      color: #1976d2;
+    }
+
+    li button.edit-btn:hover {
+      color: #0d47a1;
+    }
+
+    li button.delete-btn {
+      color: #d32f2f;
+    }
+
+    li button.delete-btn:hover {
+      color: #b71c1c;
+    }
+
+    .clear-btn,
+    .dark-toggle {
+      margin-top: 12px;
+      padding: 10px;
+      width: 100%;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      user-select: none;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .clear-btn {
+      background: var(--clear-btn-bg);
+      color: #fff;
+    }
+
+    .clear-btn:hover {
+      opacity: 0.9;
+    }
+
+    .dark-toggle {
+      background: var(--dark-toggle-bg);
+      color: var(--dark-toggle-color);
+      margin-bottom: 16px;
+    }
+
+    .dark-toggle:hover {
+      opacity: 0.9;
+    }
+
+    #progressBar {
+      height: 10px;
+      background: #e0e0e0;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    #progressFill {
+      height: 100%;
+      width: 0%;
+      background: #1976d2;
+      border-radius: 5px;
+      transition: width 0.4s ease-in-out;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="todo-container">
+    <h1>Work Planner</h1>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌓 Toggle Dark Mode</button>
+
+    <div class="input-section">
+      <input type="text" id="taskInput" placeholder="Add a new task..." />
+      <input type="date" id="dueDateInput" />
+      <select id="priorityInput">
+        <option value="low">Low</option>
+        <option value="medium" selected>Medium</option>
+        <option value="high">High</option>
+      </select>
+      <button onclick="addTask()">➕</button>
+    </div>
+
+    <div class="filters">
+      <select id="filterStatus" onchange="renderTasks()">
+        <option value="all">All</option>
+        <option value="active">Active</option>
+        <option value="done">Completed</option>
+      </select>
+      <select id="filterPriority" onchange="renderTasks()">
+        <option value="all">All Priorities</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+      <select id="sortBy" onchange="renderTasks()">
+        <option value="default">Sort By</option>
+        <option value="due">Due Date</option>
+        <option value="priority">Priority</option>
+      </select>
+    </div>
+
+    <div id="progressBar">
+      <div id="progressFill"></div>
+    </div>
+
+    <ul id="taskList"></ul>
+
+    <button class="clear-btn" onclick="clearAll()">Clear All</button>
+  </div>
+
+  <script>
+    let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    let editIndex = null;
+
+    // Apply saved theme on load
+    window.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+      renderTasks();
+    });
+
+    function toggleDarkMode() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      if (currentTheme === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+
+    function saveTasks() {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    function addTask() {
+      const input = document.getElementById('taskInput');
+      const dueDate = document.getElementById('dueDateInput').value;
+      const priority = document.getElementById('priorityInput').value;
+      const taskText = input.value.trim();
+
+      if (taskText === '') return;
+
+      if (tasks.some(t => t.text === taskText && t.dueDate === dueDate && editIndex === null)) {
+        alert('Task already exists!');
+        return;
+      }
+
+      if (editIndex !== null) {
+        tasks[editIndex] = { ...tasks[editIndex], text: taskText, dueDate, priority };
+        editIndex = null;
+      } else {
+        tasks.push({ text: taskText, done: false, dueDate, priority });
+      }
+
+      input.value = '';
+      document.getElementById('dueDateInput').value = '';
+      document.getElementById('priorityInput').value = 'medium';
+
+      saveTasks();
+      renderTasks();
+    }
+
+    function toggleDone(index) {
+      tasks[index].done = !tasks[index].done;
+      saveTasks();
+      renderTasks();
+    }
+
+    function deleteTask(index) {
+      tasks.splice(index, 1);
+      saveTasks();
+      renderTasks();
+    }
+
+    function editTask(index) {
+      const task = tasks[index];
+      document.getElementById('taskInput').value = task.text;
+      document.getElementById('dueDateInput').value = task.dueDate || '';
+      document.getElementById('priorityInput').value = task.priority;
+      editIndex = index;
+    }
+
+    function clearAll() {
+      if (confirm('Are you sure you want to clear all tasks?')) {
+        tasks = [];
+        saveTasks();
+        renderTasks();
+      }
+    }
+
+    function renderTasks() {
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+
+      const statusFilter = document.getElementById('filterStatus').value;
+      const priorityFilter = document.getElementById('filterPriority').value;
+      const sortBy = document.getElementById('sortBy').value;
+
+      // Filter tasks
+      let filteredTasks = tasks.filter(task => {
+        if (statusFilter === 'active' && task.done) return false;
+        if (statusFilter === 'done' && !task.done) return false;
+        if (priorityFilter !== 'all' && task.priority !== priorityFilter) return false;
+        return true;
+      });
+
+      // Sort tasks
+      if (sortBy === 'due') {
+        filteredTasks.sort((a, b) => {
+          if (!a.dueDate) return 1;
+          if (!b.dueDate) return -1;
+          return new Date(a.dueDate) - new Date(b.dueDate);
+        });
+      } else if (sortBy === 'priority') {
+        const priorityOrder = { high: 0, medium: 1, low: 2 };
+        filteredTasks.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+      }
+
+      // Calculate progress
+      const total = filteredTasks.length;
+      const doneCount = filteredTasks.filter(t => t.done).length;
+      const progressPercent = total === 0 ? 0 : (doneCount / total) * 100;
+      document.getElementById('progressFill').style.width = progressPercent + '%';
+
+      filteredTasks.forEach((task, idx) => {
+        const li = document.createElement('li');
+        if (task.done) li.classList.add('done');
+
+        // Toggle done on clicking task except buttons
+        li.onclick = e => {
+          if (e.target.tagName === 'BUTTON') return;
+          toggleDone(tasks.indexOf(task));
+        };
+
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'task-info';
+
+        const textSpan = document.createElement('span');
+        textSpan.textContent = task.text;
+
+        const prioritySpan = document.createElement('span');
+        prioritySpan.className = 'priority ' + task.priority;
+        prioritySpan.textContent = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+
+        textSpan.appendChild(prioritySpan);
+        infoDiv.appendChild(textSpan);
+
+        if (task.dueDate) {
+          const dueSpan = document.createElement('span');
+          dueSpan.className = 'due-date';
+          dueSpan.textContent = 'Due: ' + task.dueDate;
+          infoDiv.appendChild(dueSpan);
+        }
+
+        li.appendChild(infoDiv);
+
+        // Edit button
+        const editBtn = document.createElement('button');
+        editBtn.className = 'edit-btn';
+        editBtn.title = 'Edit';
+        editBtn.textContent = '✏️';
+        editBtn.onclick = e => {
+          e.stopPropagation();
+          editTask(tasks.indexOf(task));
+        };
+        li.appendChild(editBtn);
+
+        // Delete button
+        const delBtn = document.createElement('button');
+        delBtn.className = 'delete-btn';
+        delBtn.title = 'Delete';
+        delBtn.textContent = '❌';
+        delBtn.onclick = e => {
+          e.stopPropagation();
+          deleteTask(tasks.indexOf(task));
+        };
+        li.appendChild(delBtn);
+
+        list.appendChild(li);
+      });
+    }
+
+    // Add task on Enter key press
+    document.getElementById('taskInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addTask();
+    });
+  </script>
+</body>
+</html>
