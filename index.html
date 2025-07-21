@@ -58,9 +58,9 @@
             background: #333;
         }
 
-        .dot.red { background: #666; }
-        .dot.yellow { background: #888; }
-        .dot.green { background: #aaa; }
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27ca3f; }
 
         .terminal-title {
             flex: 1;
@@ -349,6 +349,22 @@
             padding-left: 15px;
         }
 
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin: 20px 0;
+            padding: 10px 0;
+            border-left: 2px solid #ff6b6b;
+            padding-left: 15px;
+            animation: pulse 1s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 20px 10px;
@@ -421,6 +437,7 @@
                     <span class="command">[enter] add task</span>
                     <span class="command">[click] toggle</span>
                     <span class="command">[del] remove</span>
+                    <span class="command">[ctrl+r] blocked</span>
                 </div>
             </div>
 
@@ -451,6 +468,7 @@
                 this.bindEvents();
                 this.updateDisplay();
                 this.showSystemMessage('system ready. type a task and press enter.');
+                this.preventRefresh();
             }
 
             initElements() {
@@ -461,6 +479,50 @@
                 this.activeCount = document.getElementById('activeCount');
                 this.doneCount = document.getElementById('doneCount');
                 this.ratioCount = document.getElementById('ratioCount');
+            }
+
+            preventRefresh() {
+                // Prevent F5 refresh
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'F5' || (e.ctrlKey && e.key === 'r') || (e.metaKey && e.key === 'r')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.showErrorMessage('refresh blocked - session must persist');
+                        return false;
+                    }
+                });
+
+                // Prevent context menu refresh
+                document.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    this.showErrorMessage('context menu disabled - use keyboard commands');
+                });
+
+                // Override browser refresh methods
+                if (window.history && window.history.pushState) {
+                    window.addEventListener('beforeunload', (e) => {
+                        e.preventDefault();
+                        e.returnValue = 'Tasks will be lost. Are you sure you want to leave?';
+                        return 'Tasks will be lost. Are you sure you want to leave?';
+                    });
+                }
+
+                // Prevent back/forward navigation
+                window.history.pushState(null, null, window.location.href);
+                window.addEventListener('popstate', (e) => {
+                    window.history.pushState(null, null, window.location.href);
+                    this.showErrorMessage('navigation blocked - stay focused on tasks');
+                });
+
+                // Block common refresh shortcuts
+                window.addEventListener('keydown', (e) => {
+                    // Block Ctrl+Shift+R (hard refresh)
+                    if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+                        e.preventDefault();
+                        this.showErrorMessage('hard refresh blocked - terminal locked');
+                        return false;
+                    }
+                });
             }
 
             bindEvents() {
@@ -594,6 +656,27 @@
                         setTimeout(() => msgEl.remove(), 300);
                     }
                 }, 2000);
+            }
+
+            showErrorMessage(message) {
+                // Remove existing error messages
+                const existingError = document.querySelector('.error-message');
+                if (existingError) {
+                    existingError.remove();
+                }
+
+                const errorEl = document.createElement('div');
+                errorEl.className = 'error-message';
+                errorEl.textContent = `// ERROR: ${message}`;
+                
+                this.tasksContainer.parentNode.insertBefore(errorEl, this.tasksContainer);
+                
+                setTimeout(() => {
+                    if (errorEl.parentNode) {
+                        errorEl.style.opacity = '0';
+                        setTimeout(() => errorEl.remove(), 300);
+                    }
+                }, 3000);
             }
 
             escapeHtml(text) {
