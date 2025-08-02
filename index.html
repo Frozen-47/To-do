@@ -1,718 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Manager</title>
+    <title>Todo List</title>
     <link rel="icon" href="terminal.png" type="image/png">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'JetBrains Mono', monospace;
-            background: #000;
-            color: #fff;
-            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #333; text-align: center; }
+        .input-area {
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 40px 20px;
-            line-height: 1.4;
-        }
-
-        .terminal {
-            width: 100%;
-            max-width: 700px;
-            background: #000;
-            border: 2px solid #333;
-            border-radius: 0;
-            box-shadow: 0 0 50px rgba(255, 255, 255, 0.05);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .terminal-header {
-            background: #111;
-            padding: 12px 20px;
-            border-bottom: 1px solid #333;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .terminal-dots {
-            display: flex;
-            gap: 6px;
-        }
-
-        .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #333;
-        }
-
-        .dot.red { background: #ff5f56; }
-        .dot.yellow { background: #ffbd2e; }
-        .dot.green { background: #27ca3f; }
-
-        .terminal-title {
-            flex: 1;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #666;
-            font-weight: 400;
-        }
-
-        .terminal-body {
-            padding: 30px;
-            background: #000;
-            min-height: 500px;
-        }
-
-        .prompt {
-            color: #fff;
-            font-weight: 600;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.2rem;
-        }
-
-        .prompt::before {
-            content: '❯';
-            color: #fff;
-        }
-
-        .cursor {
-            display: inline-block;
-            background: #fff;
-            width: 2px;
-            height: 1.2em;
-            animation: blink 1s infinite;
-            margin-left: 5px;
-        }
-
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-
-        .input-section {
-            margin-bottom: 40px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 30px;
-        }
-
-        .input-wrapper {
-            display: flex;
-            align-items: center;
             gap: 10px;
             margin-bottom: 20px;
         }
-
-        .input-prompt {
-            color: #888;
-            font-weight: 400;
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
         }
-
-        #taskInput {
-            background: transparent;
+        button {
+            padding: 10px 15px;
+            background: #4CAF50;
+            color: white;
             border: none;
-            color: #fff;
-            font-family: inherit;
-            font-size: 1rem;
-            flex: 1;
-            padding: 8px 0;
-            outline: none;
-            border-bottom: 1px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        #taskInput:focus {
-            border-bottom-color: #fff;
-        }
-
-        #taskInput::placeholder {
-            color: #444;
-        }
-
-        .commands {
-            font-size: 0.85rem;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        .command {
-            display: inline-block;
-            margin-right: 20px;
-            transition: color 0.2s ease;
-        }
-
-        .command:hover {
-            color: #fff;
-        }
-
-        .tasks-section {
-            position: relative;
-        }
-
-        .section-title {
-            color: #888;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            position: relative;
-        }
-
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 30px;
-            height: 1px;
-            background: #333;
-        }
-
-        .task {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            margin-bottom: 15px;
-            padding: 12px 0;
-            border-bottom: 1px solid #111;
-            transition: all 0.3s ease;
-            opacity: 0;
-            animation: fadeIn 0.5s ease forwards;
-            position: relative;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .task:hover {
-            background: rgba(255, 255, 255, 0.02);
-            transform: translateX(5px);
-        }
-
-        .task-id {
-            color: #666;
-            font-size: 0.8rem;
-            width: 30px;
-            text-align: right;
-            margin-top: 1px;
-            flex-shrink: 0;
-        }
-
-        .task-checkbox {
-            width: 16px;
-            height: 16px;
-            border: 1px solid #555;
-            background: transparent;
-            position: relative;
+            border-radius: 4px;
             cursor: pointer;
-            margin-top: 2px;
-            flex-shrink: 0;
-            transition: all 0.2s ease;
         }
-
-        .task-checkbox:hover {
-            border-color: #fff;
+        button:hover { background: #45a049; }
+        ul { list-style: none; padding: 0; }
+        li {
+            margin: 8px 0;
+            padding: 12px;
+            background: white;
+            border-left: 4px solid #2196F3;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-
-        .task-checkbox.checked {
-            background: #fff;
-            border-color: #fff;
-        }
-
-        .task-checkbox.checked::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #000;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        .task-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .task-text {
-            color: #fff;
-            font-size: 0.95rem;
-            line-height: 1.4;
-            transition: all 0.3s ease;
-            word-wrap: break-word;
-        }
-
-        .task.completed .task-text {
-            color: #555;
+        .done {
             text-decoration: line-through;
-        }
-
-        .task-timestamp {
-            color: #444;
-            font-size: 0.75rem;
-            margin-top: 4px;
-        }
-
-        .task-actions {
-            display: flex;
-            gap: 10px;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-
-        .task:hover .task-actions {
-            opacity: 1;
-        }
-
-        .task-action {
-            background: transparent;
-            border: 1px solid #333;
+            background: #e8f5e8;
+            border-left-color: #4CAF50;
             color: #666;
-            padding: 4px 8px;
-            font-size: 0.75rem;
+        }
+        li input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+        }
+        .task-text {
+            flex: 1;
+            padding: 0 5px;
+        }
+        .delete-btn {
+            background: #f44336;
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 3px;
+            color: white;
+            border: none;
             cursor: pointer;
-            font-family: inherit;
-            transition: all 0.2s ease;
         }
-
-        .task-action:hover {
-            border-color: #fff;
-            color: #fff;
-        }
-
-        .task-action.delete:hover {
-            border-color: #666;
-            color: #666;
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .stats {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #333;
-            padding: 15px 20px;
-            font-size: 0.8rem;
-            color: #888;
-            backdrop-filter: blur(10px);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .stat-line {
-            margin-bottom: 5px;
-        }
-
-        .stat-line:last-child {
-            margin-bottom: 0;
-        }
-
-        .stat-value {
-            color: #fff;
-            float: right;
-            margin-left: 20px;
-        }
-
-        .empty-message {
-            color: #444;
-            font-style: italic;
-            text-align: center;
-            padding: 40px 20px;
-            border: 1px dashed #222;
-            margin-top: 20px;
-        }
-
-        .system-message {
-            color: #666;
-            font-size: 0.85rem;
-            margin: 20px 0;
-            padding: 10px 0;
-            border-left: 2px solid #333;
-            padding-left: 15px;
-        }
-
-        .error-message {
-            color: #ff6b6b;
-            font-size: 0.85rem;
-            margin: 20px 0;
-            padding: 10px 0;
-            border-left: 2px solid #ff6b6b;
-            padding-left: 15px;
-            animation: pulse 1s ease-in-out;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 20px 10px;
-            }
-            
-            .terminal {
-                border: 1px solid #333;
-            }
-            
-            .terminal-body {
-                padding: 20px;
-            }
-            
-            .task {
-                gap: 10px;
-            }
-            
-            .task-id {
-                display: none;
-            }
-            
-            .stats {
-                position: static;
-                margin-top: 30px;
-                width: 100%;
-            }
-        }
-
-        .loading {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .loading::after {
-            content: '';
-            animation: dots 1.5s infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: ''; }
-            40% { content: '.'; }
-            60% { content: '..'; }
-            80%, 100% { content: '...'; }
-        }
+        .delete-btn:hover { background: #da190b; }
     </style>
 </head>
 <body>
-    <div class="terminal">
-        <div class="terminal-header">
-            <div class="terminal-dots">
-                <div class="dot red"></div>
-                <div class="dot yellow"></div>
-                <div class="dot green"></div>
-            </div>
-            <div class="terminal-title">todo.exe</div>
-        </div>
-        
-        <div class="terminal-body">
-            <div class="prompt">
-                TASK MANAGER v4.7
-                <span class="cursor"></span>
-            </div>
-            
-            <div class="input-section">
-                <div class="input-wrapper">
-                    <span class="input-prompt">➤ add:</span>
-                    <input type="text" id="taskInput" placeholder="describe your task..." maxlength="150">
-                </div>
-                <div class="commands">
-                    <span class="command">[enter] add task</span>
-                    <span class="command">[click] toggle</span>
-                    <span class="command">[del] remove</span>
-                    <span class="command">[ctrl+r] blocked</span>
-                </div>
-            </div>
-
-            <div class="tasks-section">
-                <div class="section-title">Active Tasks</div>
-                <div id="tasksContainer"></div>
-                <div class="empty-message" id="emptyMessage" style="display: none;">
-                    // no tasks found<br>
-                    // add your first task above
-                </div>
-            </div>
-        </div>
+    <h1>Todo List</h1>
+    <div class="input-area">
+        <input id="task" placeholder="Enter task">
+        <button onclick="add()">Add</button>
     </div>
-
-    <div class="stats" id="stats">
-        <div class="stat-line">total: <span class="stat-value" id="totalCount">0</span></div>
-        <div class="stat-line">active: <span class="stat-value" id="activeCount">0</span></div>
-        <div class="stat-line">done: <span class="stat-value" id="doneCount">0</span></div>
-        <div class="stat-line">ratio: <span class="stat-value" id="ratioCount">0%</span></div>
-    </div>
+    <ul id="list"></ul>
 
     <script>
-        class TerminalTodo {
-            constructor() {
-                this.tasks = [];
-                this.taskCounter = 1;
-                this.initElements();
-                this.bindEvents();
-                this.updateDisplay();
-                this.showSystemMessage('system ready. type a task and press enter.');
-                this.preventRefresh();
-            }
+        const todos = [], $ = id => document.getElementById(id);
 
-            initElements() {
-                this.taskInput = document.getElementById('taskInput');
-                this.tasksContainer = document.getElementById('tasksContainer');
-                this.emptyMessage = document.getElementById('emptyMessage');
-                this.totalCount = document.getElementById('totalCount');
-                this.activeCount = document.getElementById('activeCount');
-                this.doneCount = document.getElementById('doneCount');
-                this.ratioCount = document.getElementById('ratioCount');
-            }
-
-            preventRefresh() {
-                // Prevent F5 refresh
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'F5' || (e.ctrlKey && e.key === 'r') || (e.metaKey && e.key === 'r')) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        this.showErrorMessage('refresh blocked - session must persist');
-                        return false;
-                    }
-                });
-
-                // Prevent context menu refresh
-                document.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    this.showErrorMessage('context menu disabled - use keyboard commands');
-                });
-
-                // Override browser refresh methods
-                if (window.history && window.history.pushState) {
-                    window.addEventListener('beforeunload', (e) => {
-                        e.preventDefault();
-                        e.returnValue = 'Tasks will be lost. Are you sure you want to leave?';
-                        return 'Tasks will be lost. Are you sure you want to leave?';
-                    });
-                }
-
-                // Prevent back/forward navigation
-                window.history.pushState(null, null, window.location.href);
-                window.addEventListener('popstate', (e) => {
-                    window.history.pushState(null, null, window.location.href);
-                    this.showErrorMessage('navigation blocked - stay focused on tasks');
-                });
-
-                // Block common refresh shortcuts
-                window.addEventListener('keydown', (e) => {
-                    // Block Ctrl+Shift+R (hard refresh)
-                    if (e.ctrlKey && e.shiftKey && e.key === 'R') {
-                        e.preventDefault();
-                        this.showErrorMessage('hard refresh blocked - terminal locked');
-                        return false;
-                    }
-                });
-            }
-
-            bindEvents() {
-                this.taskInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        this.addTask();
-                    }
-                });
-
-                this.taskInput.addEventListener('input', (e) => {
-                    // Simulate typing effect
-                    if (Math.random() > 0.95) {
-                        this.showSystemMessage('parsing input...');
-                    }
-                });
-            }
-
-            addTask() {
-                const text = this.taskInput.value.trim();
-                if (!text) return;
-
-                const task = {
-                    id: this.taskCounter++,
-                    text: text,
-                    completed: false,
-                    createdAt: new Date(),
-                    timestamp: this.formatTimestamp(new Date())
-                };
-
-                this.tasks.unshift(task);
-                this.taskInput.value = '';
-                
-                this.showSystemMessage(`task #${task.id} added successfully.`);
-                this.updateDisplay();
-            }
-
-            toggleTask(id) {
-                const task = this.tasks.find(t => t.id === id);
-                if (task) {
-                    task.completed = !task.completed;
-                    const status = task.completed ? 'completed' : 'reactivated';
-                    this.showSystemMessage(`task #${id} ${status}.`);
-                    this.updateDisplay();
-                }
-            }
-
-            deleteTask(id) {
-                const taskElement = document.querySelector(`[data-task-id="${id}"]`);
-                if (taskElement) {
-                    taskElement.style.animation = 'fadeOut 0.3s ease forwards';
-                    
-                    setTimeout(() => {
-                        this.tasks = this.tasks.filter(t => t.id !== id);
-                        this.showSystemMessage(`task #${id} deleted.`);
-                        this.updateDisplay();
-                    }, 300);
-                }
-            }
-
-            updateDisplay() {
-                this.renderTasks();
-                this.updateStats();
-            }
-
-            renderTasks() {
-                if (this.tasks.length === 0) {
-                    this.emptyMessage.style.display = 'block';
-                    this.tasksContainer.innerHTML = '';
-                    return;
-                }
-
-                this.emptyMessage.style.display = 'none';
-                
-                this.tasksContainer.innerHTML = this.tasks.map((task, index) => `
-                    <div class="task ${task.completed ? 'completed' : ''}" data-task-id="${task.id}" style="animation-delay: ${index * 0.1}s">
-                        <div class="task-id">#${task.id}</div>
-                        <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="todoApp.toggleTask(${task.id})"></div>
-                        <div class="task-content">
-                            <div class="task-text">${this.escapeHtml(task.text)}</div>
-                            <div class="task-timestamp">${task.timestamp}</div>
-                        </div>
-                        <div class="task-actions">
-                            <button class="task-action toggle" onclick="todoApp.toggleTask(${task.id})">
-                                ${task.completed ? 'undo' : 'done'}
-                            </button>
-                            <button class="task-action delete" onclick="todoApp.deleteTask(${task.id})">del</button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            updateStats() {
-                const total = this.tasks.length;
-                const completed = this.tasks.filter(t => t.completed).length;
-                const active = total - completed;
-                const ratio = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-                this.totalCount.textContent = total;
-                this.activeCount.textContent = active;
-                this.doneCount.textContent = completed;
-                this.ratioCount.textContent = `${ratio}%`;
-            }
-
-            formatTimestamp(date) {
-                const now = new Date();
-                const diffMs = now - date;
-                const diffMins = Math.floor(diffMs / 60000);
-                
-                if (diffMins < 1) return 'just now';
-                if (diffMins < 60) return `${diffMins}m ago`;
-                if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
-                return date.toLocaleDateString();
-            }
-
-            showSystemMessage(message) {
-                // Remove existing system messages
-                const existingMsg = document.querySelector('.system-message');
-                if (existingMsg) {
-                    existingMsg.remove();
-                }
-
-                const msgEl = document.createElement('div');
-                msgEl.className = 'system-message';
-                msgEl.textContent = `// ${message}`;
-                
-                this.tasksContainer.parentNode.insertBefore(msgEl, this.tasksContainer);
-                
-                setTimeout(() => {
-                    if (msgEl.parentNode) {
-                        msgEl.style.opacity = '0';
-                        setTimeout(() => msgEl.remove(), 300);
-                    }
-                }, 2000);
-            }
-
-            showErrorMessage(message) {
-                // Remove existing error messages
-                const existingError = document.querySelector('.error-message');
-                if (existingError) {
-                    existingError.remove();
-                }
-
-                const errorEl = document.createElement('div');
-                errorEl.className = 'error-message';
-                errorEl.textContent = `// ERROR: ${message}`;
-                
-                this.tasksContainer.parentNode.insertBefore(errorEl, this.tasksContainer);
-                
-                setTimeout(() => {
-                    if (errorEl.parentNode) {
-                        errorEl.style.opacity = '0';
-                        setTimeout(() => errorEl.remove(), 300);
-                    }
-                }, 3000);
-            }
-
-            escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
+        function add() {
+            const val = $('task').value.trim();
+            if (!val) return;
+            todos.push({ text: val, done: false });
+            $('task').value = '';
+            render();
         }
 
-        // Add fadeOut animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeOut {
-                to {
-                    opacity: 0;
-                    transform: translateX(-100%);
-                    height: 0;
-                    margin-bottom: 0;
-                    padding-top: 0;
-                    padding-bottom: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
+        function toggle(i) {
+            todos[i].done ^= 1;
+            render();
+        }
 
-        // Initialize the app
-        const todoApp = new TerminalTodo();
+        const remove = i => (todos.splice(i, 1), render());
 
-        // Add some terminal-like interactions
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'c') {
-                e.preventDefault();
-                document.getElementById('taskInput').value = '';
-                todoApp.showSystemMessage('input cleared.');
-            }
-        });
+        function render() {
+            $('list').innerHTML = todos.map((t, i) =>
+                `<li class="${t.done ? 'done' : ''}">
+                    <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggle(${i})">
+                    <span class="task-text">${t.text}</span>
+                    <button class="delete-btn" onclick="remove(${i})">Delete</button>
+                </li>`
+            ).join('');
+        }
+
+        $('task').addEventListener('keypress', e => e.key === 'Enter' && add());
     </script>
 </body>
 </html>
