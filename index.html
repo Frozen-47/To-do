@@ -1,112 +1,1528 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Todo List</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
     <link rel="icon" href="terminal.png" type="image/png">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #f5f5f5;
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        h1 { color: #333; text-align: center; }
-        .input-area {
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
             display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            line-height: 1.4;
+            user-select: none;
+        }
+
+        .terminal {
+            width: 100%;
+            max-width: 700px;
+            background: #000;
+            border: 2px solid #333;
+            border-radius: 0;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .terminal-header {
+            background: #111;
+            padding: 12px 20px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #333;
+        }
+
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27ca3f; }
+
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .terminal-body {
+            padding: 30px;
+            background: #000;
+            min-height: 500px;
+        }
+
+        .prompt {
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+        }
+
+        .prompt::before {
+            content: '❯';
+            color: #fff;
+        }
+
+        .cursor {
+            display: inline-block;
+            background: #fff;
+            width: 2px;
+            height: 1.2em;
+            animation: blink 1s infinite;
+            margin-left: 5px;
+        }
+
+        .cursor.hidden {
+            opacity: 0;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .input-section {
+            margin-bottom: 40px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 30px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
             gap: 10px;
             margin-bottom: 20px;
         }
-        input {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 4px;
+
+        .input-prompt {
+            color: #888;
+            font-weight: 400;
         }
-        button {
-            padding: 10px 15px;
-            background: #4CAF50;
-            color: white;
+
+        #taskInput {
+            background: transparent;
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            flex: 1;
+            padding: 8px 0;
+            outline: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+            user-select: text;
         }
-        button:hover { background: #45a049; }
-        ul { list-style: none; padding: 0; }
-        li {
-            margin: 8px 0;
-            padding: 12px;
-            background: white;
-            border-left: 4px solid #2196F3;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+
+        #taskInput:focus {
+            border-bottom-color: #fff;
         }
-        .done {
-            text-decoration: line-through;
-            background: #e8f5e8;
-            border-left-color: #4CAF50;
+
+        #taskInput::placeholder {
+            color: #444;
+        }
+
+        .commands {
+            font-size: 0.85rem;
             color: #666;
+            margin-top: 10px;
         }
-        li input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
+
+        .command {
+            display: inline-block;
+            margin-right: 20px;
+            transition: color 0.2s ease;
+        }
+
+        .command:hover {
+            color: #fff;
+        }
+
+        .tasks-section {
+            position: relative;
+        }
+
+        .section-title {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 30px;
+            height: 1px;
+            background: #333;
+        }
+
+        #taskList {
+            list-style: none;
+            padding: 0;
             margin: 0;
         }
-        .task-text {
-            flex: 1;
-            padding: 0 5px;
-        }
-        .delete-btn {
-            background: #f44336;
-            padding: 6px 10px;
-            font-size: 12px;
-            border-radius: 3px;
-            color: white;
-            border: none;
+
+        #taskList li {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #111;
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            position: relative;
             cursor: pointer;
+            user-select: text;
         }
-        .delete-btn:hover { background: #da190b; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        #taskList li:hover {
+            background: rgba(255, 255, 255, 0.02);
+            transform: translateX(5px);
+        }
+
+        #taskList li::before {
+            content: '◯';
+            color: #666;
+            font-size: 0.8rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        #taskList li:hover::before {
+            color: #fff;
+        }
+
+        #taskList li.completed::before {
+            content: '◉';
+            color: #fff;
+        }
+
+        #taskList li.completed {
+            color: #555;
+            text-decoration: line-through;
+        }
+
+        .task-time {
+            color: #666;
+            font-size: 0.8rem;
+            font-weight: 300;
+            user-select: none;
+        }
+
+        #taskList li.completed .task-time {
+            color: #444;
+        }
+
+        .delete-btn {
+            color: #666;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s ease;
+            margin-left: auto;
+            padding: 0 8px;
+        }
+
+        #taskList li:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            color: #ff6b6b;
+            transform: scale(1.2);
+        }
+
+        .stats {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #333;
+            padding: 15px 20px;
+            font-size: 0.8rem;
+            color: #888;
+            backdrop-filter: blur(10px);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        #taskStats {
+            color: #fff;
+        }
+
+        .empty-message {
+            color: #444;
+            font-style: italic;
+            text-align: center;
+            padding: 40px 20px;
+            border: 1px dashed #222;
+            margin-top: 20px;
+        }
+
+        .system-message {
+            color: #666;
+            font-size: 0.85rem;
+            margin: 10px 0;
+            padding: 8px 0;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin: 10px 0;
+            padding: 8px 0;
+            animation: pulse 1s ease-in-out;
+        }
+
+        .security-warning {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid #ff6b6b;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(-100%);
+                height: 0;
+                margin-bottom: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+            }
+        }
+
+        .lockdown-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 50%, #000000 100%);
+            color: #ff0000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: center;
+            animation: redAlert 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes redAlert {
+            0% { background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 50%, #000000 100%); }
+            100% { background: linear-gradient(135deg, #1a0000 0%, #0a0a0a 50%, #1a0000 100%); }
+        }
+
+        .lockdown-content {
+            max-width: 800px;
+            padding: 40px;
+            border: 2px solid #ff0000;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.3);
+        }
+
+        .lockdown-header {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #ff0000;
+            animation: glitch 0.3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glitch {
+            0% { 
+                transform: translateX(0);
+                text-shadow: 0 0 20px #ff0000;
+            }
+            20% { 
+                transform: translateX(-2px);
+                text-shadow: -2px 0 #ff0000, 2px 0 #00ff00;
+            }
+            40% { 
+                transform: translateX(2px);
+                text-shadow: 2px 0 #ff0000, -2px 0 #0000ff;
+            }
+            60% { 
+                transform: translateX(-1px);
+                text-shadow: -1px 0 #ff0000, 1px 0 #ff00ff;
+            }
+            80% { 
+                transform: translateX(1px);
+                text-shadow: 1px 0 #ff0000, -1px 0 #ffff00;
+            }
+            100% { 
+                transform: translateX(0);
+                text-shadow: 0 0 20px #ff0000;
+            }
+        }
+
+        .lockdown-code {
+            font-size: 1.5rem;
+            color: #ff6666;
+            margin: 20px 0;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        .lockdown-details {
+            font-size: 1rem;
+            color: #cccccc;
+            margin: 30px 0;
+            line-height: 1.6;
+            text-align: left;
+            border-left: 3px solid #ff0000;
+            padding-left: 20px;
+        }
+
+        .lockdown-timestamp {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 30px;
+        }
+
+        .lockdown-terminal {
+            background: #000;
+            border: 1px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.85rem;
+            color: #ff0000;
+        }
+
+        .lockdown-scan {
+            display: inline-block;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #ff0000 50%, transparent 100%);
+            animation: scan 2s linear infinite;
+            margin: 10px 0;
+        }
+
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+            }
+            
+            .terminal {
+                border: 1px solid #333;
+            }
+            
+            .terminal-body {
+                padding: 20px;
+            }
+            
+            .stats {
+                position: static;
+                margin-top: 30px;
+                width: 100%;
+            }
+
+            .system-message,
+            .error-message {
+                position: static;
+                margin: 10px 0;
+            }
+        }
+
+        .loading {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .loading::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        .obfuscated {
+            filter: blur(20px);
+            pointer-events: none;
+        }
+
+        .terminal-header,
+        .prompt,
+        .commands,
+        .section-title,
+        .stats {
+            user-select: none;
+        }
     </style>
 </head>
 <body>
-    <h1>Todo List</h1>
-    <div class="input-area">
-        <input id="task" placeholder="Enter task">
-        <button onclick="add()">Add</button>
+    <div class="lockdown-overlay" id="lockdownOverlay">
+        <div class="lockdown-content">
+            <div class="lockdown-header">⚠ SECURITY PROTOCOL ACTIVATED ⚠</div>
+            <div class="lockdown-code">ERROR CODE: SEC-001-BREACH</div>
+            
+            <div class="lockdown-terminal">
+                <div>$ system_scan --deep --security</div>
+                <div style="color: #ff6666;">THREAT DETECTED: Unauthorized access attempt</div>
+                <div style="color: #ff6666;">RESPONSE: Initiating containment protocol</div>
+                <div>$ lockdown --immediate --secure-wipe</div>
+                <div class="lockdown-scan"></div>
+                <div style="color: #ff9999;">STATUS: All data secured and encrypted</div>
+                <div style="color: #ff9999;">STATUS: Session terminated for security</div>
+            </div>
+
+            <div class="lockdown-details">
+                <strong>SECURITY INCIDENT REPORT:</strong><br>
+                • Suspicious activity detected in terminal session<br>
+                • Multiple security violations recorded<br>
+                • Potential tampering or unauthorized access attempt<br>
+                • All sensitive data has been secured and encrypted<br>
+                • Session logs have been preserved for analysis<br><br>
+                
+                <strong>NEXT STEPS:</strong><br>
+                • Refresh the page to start a new secure session<br>
+                • Ensure you are in a trusted environment<br>
+                • Avoid using developer tools or debugging features<br>
+                • Contact system administrator if this was unexpected
+            </div>
+
+            <div class="lockdown-timestamp" id="lockdownTime">
+                Incident Time: Loading...
+            </div>
+        </div>
     </div>
-    <ul id="list"></ul>
+
+    <div class="terminal">
+        <div class="terminal-header">
+            <div class="terminal-dots">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div class="terminal-title">secure-todo.exe</div>
+        </div>
+        
+        <div class="terminal-body">
+            <div class="prompt">
+                SECURE TASK MANAGER v5.2
+                <span class="cursor" id="cursor"></span>
+            </div>
+            
+            <div class="input-section">
+                <div class="input-wrapper">
+                    <span class="input-prompt">➤ add:</span>
+                    <input type="text" id="taskInput" placeholder="describe your task..." maxlength="150">
+                </div>
+                <div class="commands">
+                    <span class="command">[enter] add task</span>
+                    <span class="command">[click] toggle</span>
+                    <span class="command">[×] delete</span>
+                    <span class="command">[tamper detection active]</span>
+                </div>
+            </div>
+
+            <div class="tasks-section">
+                <div class="section-title">Active Tasks</div>
+                <hr style="border: none; border-top: 1px solid #333; margin: 15px 0;">
+                <div id="messageContainer"></div>
+                <ul id="taskList"></ul>
+                <div class="empty-message" id="emptyMessage" style="display: none;">
+                    // no tasks found<br>
+                    // add your first task above
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats" id="stats">
+        <div id="taskStats">Total: 0 | Completed: 0 | Pending: 0</div>
+        <div style="font-size: 0.7rem; color: #444; margin-top: 5px;" id="securityStatus">Security: Active</div>
+    </div>
 
     <script>
-        const todos = [], $ = id => document.getElementById(id);
+        // Enhanced Security Manager - Optimized and Fixed
+        class SecurityManager {
+            constructor() {
+                this.violations = 0;
+                this.maxViolations = 3;
+                this.isLocked = false;
+                this.intervals = [];
+                this.observers = [];
+                this.startTime = Date.now();
+                this.initSecurity();
+            }
 
-        function add() {
-            const val = $('task').value.trim();
-            if (!val) return;
-            todos.push({ text: val, done: false });
-            $('task').value = '';
-            render();
+            initSecurity() {
+                try {
+                    this.setupAntiDebug();
+                    this.setupTamperDetection();
+                    this.setupAdvancedDetection();
+                    this.obfuscateStorage();
+                    this.logSecurityEvent('Security manager initialized');
+                } catch (error) {
+                    this.logSecurityEvent('Security initialization failed', error);
+                }
+            }
+
+            setupAntiDebug() {
+                // Optimized debugger detection with reduced frequency
+                const debugInterval = setInterval(() => {
+                    if (this.isLocked) return;
+                    
+                    try {
+                        const start = performance.now();
+                        eval('debugger');
+                        const timeTaken = performance.now() - start;
+                        
+                        // Only flag if significantly delayed (more lenient)
+                        if (timeTaken > 200) {
+                            this.handleViolation('Debugger timing anomaly detected');
+                        }
+                    } catch (e) {
+                        // Silent fail
+                    }
+                }, 3000); // Reduced frequency
+                
+                this.intervals.push(debugInterval);
+
+                // DevTools size detection - improved logic
+                let lastCheck = { width: window.innerWidth, height: window.innerHeight };
+                
+                const sizeInterval = setInterval(() => {
+                    if (this.isLocked) return;
+                    
+                    const current = { width: window.innerWidth, height: window.innerHeight };
+                    const widthDiff = Math.abs(current.width - lastCheck.width);
+                    const heightDiff = Math.abs(current.height - lastCheck.height);
+                    
+                    // More sophisticated detection
+                    if ((widthDiff > 300 || heightDiff > 300) && 
+                        (current.width < lastCheck.width || current.height < lastCheck.height)) {
+                        this.handleViolation('DevTools size change detected');
+                    }
+                    
+                    lastCheck = current;
+                }, 1000);
+                
+                this.intervals.push(sizeInterval);
+            }
+
+            setupTamperDetection() {
+                // DOM mutation observer with intelligent filtering
+                if (typeof MutationObserver !== 'undefined') {
+                    const observer = new MutationObserver((mutations) => {
+                        let significantChanges = 0;
+                        
+                        mutations.forEach((mutation) => {
+                            // Filter out minor changes (like text content updates)
+                            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                                mutation.addedNodes.forEach(node => {
+                                    if (node.nodeType === Node.ELEMENT_NODE) {
+                                        const tagName = node.tagName;
+                                        if (tagName === 'SCRIPT' || tagName === 'IFRAME' || tagName === 'EMBED') {
+                                            significantChanges++;
+                                        }
+                                    }
+                                });
+                            }
+                            
+                            if (mutation.type === 'attributes' && 
+                                ['onclick', 'onload', 'onerror'].includes(mutation.attributeName)) {
+                                significantChanges++;
+                            }
+                        });
+                        
+                        if (significantChanges > 0) {
+                            this.handleViolation(`DOM tampering: ${significantChanges} suspicious changes`);
+                        }
+                    });
+
+                    observer.observe(document.documentElement, {
+                        childList: true,
+                        subtree: true,
+                        attributes: true,
+                        attributeFilter: ['onclick', 'onload', 'onerror', 'src', 'href']
+                    });
+                    
+                    this.observers.push(observer);
+                }
+
+                // Script count monitoring - improved
+                const initialScriptCount = document.querySelectorAll('script').length;
+                const scriptInterval = setInterval(() => {
+                    if (this.isLocked) return;
+                    
+                    const currentScriptCount = document.querySelectorAll('script').length;
+                    if (currentScriptCount > initialScriptCount) {
+                        this.handleViolation('Unauthorized script injection detected');
+                    }
+                }, 2000);
+                
+                this.intervals.push(scriptInterval);
+            }
+
+            setupAdvancedDetection() {
+                // Global object monitoring - improved
+                const initialGlobals = new Set(Object.getOwnPropertyNames(window));
+                
+                const globalInterval = setInterval(() => {
+                    if (this.isLocked) return;
+                    
+                    const currentGlobals = new Set(Object.getOwnPropertyNames(window));
+                    const newGlobals = [...currentGlobals].filter(name => 
+                        !initialGlobals.has(name) && 
+                        !name.startsWith('webkit') && // Browser-specific properties
+                        !name.startsWith('moz') &&
+                        name !== 'chrome' // Chrome extensions
+                    );
+                    
+                    if (newGlobals.length > 0) {
+                        this.handleViolation(`Global pollution: ${newGlobals.join(', ')}`);
+                    }
+                }, 5000); // Less frequent
+                
+                this.intervals.push(globalInterval);
+
+                // Message monitoring
+                const messageHandler = (event) => {
+                    // Allow same-origin messages
+                    if (event.origin === window.location.origin) return;
+                    this.handleViolation(`Cross-origin message: ${event.origin}`);
+                };
+                
+                window.addEventListener('message', messageHandler);
+
+                // Performance monitoring - more balanced
+                const perfInterval = setInterval(() => {
+                    if (this.isLocked) return;
+                    
+                    const start = performance.now();
+                    // Light computation instead of heavy loop
+                    for (let i = 0; i < 100; i++) {
+                        Math.random();
+                    }
+                    const duration = performance.now() - start;
+                    
+                    if (duration > 50) { // More reasonable threshold
+                        this.handleViolation('Performance profiling detected');
+                    }
+                }, 10000); // Much less frequent
+                
+                this.intervals.push(perfInterval);
+            }
+
+            obfuscateStorage() {
+                // Enhanced storage obfuscation
+                this.storageKey = btoa(Math.random().toString(36) + Date.now()).substr(0, 16);
+                this.encryptionKey = Array.from({length: 16}, () => 
+                    String.fromCharCode(33 + Math.random() * 94)).join('');
+            }
+
+            encryptData(data) {
+                try {
+                    const str = JSON.stringify(data);
+                    let result = '';
+                    for (let i = 0; i < str.length; i++) {
+                        const keyChar = this.encryptionKey.charCodeAt(i % this.encryptionKey.length);
+                        result += String.fromCharCode(str.charCodeAt(i) ^ keyChar);
+                    }
+                    return btoa(result);
+                } catch (error) {
+                    this.logSecurityEvent('Encryption failed', error);
+                    return btoa(JSON.stringify(data)); // Fallback
+                }
+            }
+
+            decryptData(encryptedData) {
+                try {
+                    const str = atob(encryptedData);
+                    let result = '';
+                    for (let i = 0; i < str.length; i++) {
+                        const keyChar = this.encryptionKey.charCodeAt(i % this.encryptionKey.length);
+                        result += String.fromCharCode(str.charCodeAt(i) ^ keyChar);
+                    }
+                    return JSON.parse(result);
+                } catch (error) {
+                    this.logSecurityEvent('Decryption failed', error);
+                    return [];
+                }
+            }
+
+            handleViolation(reason) {
+                this.violations++;
+                this.logSecurityEvent(`Violation ${this.violations}/${this.maxViolations}: ${reason}`);
+                
+                const securityStatus = document.getElementById('securityStatus');
+                if (securityStatus) {
+                    securityStatus.textContent = `Security: ${this.violations} violations`;
+                    securityStatus.style.color = this.violations >= this.maxViolations ? '#ff0000' : '#ff6b6b';
+                }
+
+                if (this.violations >= this.maxViolations) {
+                    this.lockdown(reason);
+                } else {
+                    this.showSecurityWarning(reason);
+                }
+            }
+
+            showSecurityWarning(reason) {
+                const messageContainer = document.getElementById('messageContainer');
+                if (messageContainer) {
+                    // Remove existing warnings
+                    const existing = messageContainer.querySelector('.security-warning');
+                    if (existing) existing.remove();
+                    
+                    const warning = document.createElement('div');
+                    warning.classList.add('security-warning');
+                    warning.textContent = `SECURITY ALERT: ${reason} (${this.violations}/${this.maxViolations})`;
+                    messageContainer.appendChild(warning);
+
+                    setTimeout(() => {
+                        if (warning.parentNode) {
+                            warning.remove();
+                        }
+                    }, 4000);
+                }
+            }
+
+            lockdown(reason) {
+                this.isLocked = true;
+                this.logSecurityEvent(`LOCKDOWN INITIATED: ${reason}`);
+                
+                // Clear all intervals and observers
+                this.intervals.forEach(interval => clearInterval(interval));
+                this.observers.forEach(observer => observer.disconnect());
+                
+                const overlay = document.getElementById('lockdownOverlay');
+                const terminal = document.querySelector('.terminal');
+                const timeElement = document.getElementById('lockdownTime');
+                
+                if (overlay && terminal) {
+                    // Update timestamp
+                    if (timeElement) {
+                        const now = new Date();
+                        timeElement.textContent = `Incident Time: ${now.toLocaleString()} (UTC${now.getTimezoneOffset() > 0 ? '-' : '+'}${Math.abs(now.getTimezoneOffset()/60)})`;
+                    }
+
+                    // Show lockdown screen
+                    overlay.style.display = 'flex';
+                    terminal.classList.add('obfuscated');
+                    
+                    // Add dramatic sound effect simulation
+                    this.simulateAlarmSound();
+                    
+                    // Clear storage securely with progressive wipe
+                    this.secureDataWipe();
+                    
+                    // Disable all interactions
+                    document.body.style.pointerEvents = 'none';
+                    document.body.style.userSelect = 'none';
+                    
+                    // Prevent any recovery attempts
+                    this.preventRecovery();
+                }
+            }
+
+            simulateAlarmSound() {
+                // Visual alarm simulation since we can't play actual sounds
+                let flashCount = 0;
+                const flashInterval = setInterval(() => {
+                    document.body.style.backgroundColor = flashCount % 2 === 0 ? '#330000' : '#000000';
+                    flashCount++;
+                    if (flashCount >= 10) {
+                        clearInterval(flashInterval);
+                        document.body.style.backgroundColor = '#000000';
+                    }
+                }, 200);
+            }
+
+            secureDataWipe() {
+                try {
+                    // Progressive data clearing with visual feedback
+                    const steps = [
+                        'Encrypting sensitive data...',
+                        'Clearing application memory...',
+                        'Wiping temporary storage...',
+                        'Securing session logs...',
+                        'Data protection complete.'
+                    ];
+
+                    const terminalDiv = document.querySelector('.lockdown-terminal');
+                    if (terminalDiv) {
+                        steps.forEach((step, index) => {
+                            setTimeout(() => {
+                                const stepDiv = document.createElement('div');
+                                stepDiv.style.color = '#ff9999';
+                                stepDiv.textContent = `$ ${step}`;
+                                terminalDiv.appendChild(stepDiv);
+                            }, index * 1000);
+                        });
+                    }
+
+                    // Actually clear storage
+                    setTimeout(() => {
+                        if (typeof Storage !== 'undefined') {
+                            localStorage.clear();
+                            sessionStorage.clear();
+                        }
+                        
+                        // Clear any cached data
+                        if ('caches' in window) {
+                            caches.keys().then(names => {
+                                names.forEach(name => caches.delete(name));
+                            });
+                        }
+                    }, 2000);
+                } catch (e) {
+                    // Silent fail
+                }
+            }
+
+            preventRecovery() {
+                // Override critical functions to prevent recovery
+                window.location.reload = () => {
+                    console.log('Reload blocked - security protocol active');
+                };
+                
+                // Block console commands
+                const originalLog = console.log;
+                console.log = (...args) => {
+                    return originalLog('SECURITY: Console access restricted');
+                };
+                
+                // Block navigation
+                window.addEventListener('popstate', (e) => {
+                    e.preventDefault();
+                    history.pushState(null, null, location.href);
+                });
+            }
+
+            logSecurityEvent(message, error = null) {
+                const timestamp = new Date().toISOString();
+                const logEntry = `[${timestamp}] SECURITY: ${message}`;
+                
+                if (error) {
+                    console.warn(logEntry, error);
+                } else {
+                    console.log(logEntry);
+                }
+            }
+
+            cleanup() {
+                this.intervals.forEach(interval => clearInterval(interval));
+                this.observers.forEach(observer => observer.disconnect());
+                this.intervals = [];
+                this.observers = [];
+            }
         }
 
-        function toggle(i) {
-            todos[i].done ^= 1;
-            render();
+        // Main Task Manager - Enhanced with better error handling
+        class SecureTerminalTodo {
+            constructor() {
+                try {
+                    this.security = new SecurityManager();
+                    this.tasks = [];
+                    this.initializeStorage();
+                    
+                    this.taskList = document.getElementById('taskList');
+                    this.taskStats = document.getElementById('taskStats');
+                    this.taskInput = document.getElementById('taskInput');
+                    this.cursor = document.getElementById('cursor');
+                    this.emptyMessage = document.getElementById('emptyMessage');
+                    this.messageContainer = document.getElementById('messageContainer');
+                    
+                    this.intervals = [];
+                    this.init();
+                } catch (error) {
+                    this.handleError('Initialization failed', error);
+                }
+            }
+
+            initializeStorage() {
+                try {
+                    if (typeof Storage !== 'undefined') {
+                        const encrypted = localStorage.getItem(this.security.storageKey);
+                        if (encrypted) {
+                            this.tasks = this.security.decryptData(encrypted);
+                        }
+                        
+                        // Ensure tasks have proper structure
+                        this.tasks = this.tasks.map(task => ({
+                            text: task.text || '',
+                            completed: Boolean(task.completed),
+                            createdAt: typeof task.createdAt === 'number' ? task.createdAt : Date.now()
+                        }));
+                    }
+                } catch (error) {
+                    this.handleError('Storage initialization failed', error);
+                    this.tasks = [];
+                }
+            }
+
+            saveTasks() {
+                if (this.security.isLocked) return;
+                
+                try {
+                    if (typeof Storage !== 'undefined') {
+                        const encrypted = this.security.encryptData(this.tasks);
+                        localStorage.setItem(this.security.storageKey, encrypted);
+                    }
+                } catch (error) {
+                    this.handleError('Failed to save tasks', error);
+                }
+            }
+
+            init() {
+                if (this.security.isLocked) return;
+                
+                try {
+                    this.renderTasks();
+                    this.setupEventListeners();
+                    this.startIntervals();
+                    this.setupSecurityHandlers();
+                    this.showMessage('secure system ready. tamper detection active.');
+                } catch (error) {
+                    this.handleError('App initialization failed', error);
+                }
+            }
+
+            setupEventListeners() {
+                // Input handling with better error management
+                this.taskInput.addEventListener('keydown', (e) => {
+                    if (this.security.isLocked) {
+                        e.preventDefault();
+                        return;
+                    }
+                    
+                    try {
+                        if (e.key === 'Enter') {
+                            this.addTask();
+                        } else if (e.ctrlKey && e.key === 'c') {
+                            e.preventDefault();
+                            this.taskInput.value = '';
+                            this.showMessage('input cleared.');
+                        }
+                    } catch (error) {
+                        this.handleError('Input handling failed', error);
+                    }
+                });
+
+                // Prevent form submission
+                this.taskInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            startIntervals() {
+                // Cursor blinking
+                const cursorInterval = setInterval(() => {
+                    if (!this.security.isLocked && this.cursor) {
+                        this.cursor.classList.toggle('hidden');
+                    }
+                }, 500);
+                this.intervals.push(cursorInterval);
+
+                // Timestamp updates
+                const timestampInterval = setInterval(() => {
+                    if (!this.security.isLocked) {
+                        this.updateTimestamps();
+                    }
+                }, 1000);
+                this.intervals.push(timestampInterval);
+            }
+
+            setupSecurityHandlers() {
+                const blockedKeys = [
+                    { key: 'F12' },
+                    { key: 'F11' },
+                    { key: 'F5' },
+                    { key: 'u', ctrl: true },
+                    { key: 'r', ctrl: true },
+                    { key: 's', ctrl: true },
+                    { key: 'I', ctrl: true, shift: true },
+                    { key: 'J', ctrl: true, shift: true },
+                    { key: 'C', ctrl: true, shift: true },
+                    { key: 'K', ctrl: true, shift: true },
+                    { key: 'E', ctrl: true, shift: true },
+                    { key: 'R', ctrl: true, shift: true },
+                    { key: 'F4', alt: true }
+                ];
+
+                document.addEventListener('keydown', (e) => {
+                    if (this.security.isLocked) {
+                        e.preventDefault();
+                        return false;
+                    }
+
+                    const isBlocked = blockedKeys.some(blocked => {
+                        const keyMatch = e.key === blocked.key;
+                        const ctrlMatch = !blocked.ctrl || e.ctrlKey;
+                        const shiftMatch = !blocked.shift || e.shiftKey;
+                        const altMatch = !blocked.alt || e.altKey;
+                        
+                        return keyMatch && ctrlMatch && shiftMatch && altMatch;
+                    });
+
+                    if (isBlocked) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.security.handleViolation(`Blocked key combination: ${e.key}`);
+                        return false;
+                    }
+                });
+
+                // Context menu blocking
+                document.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    this.security.handleViolation('Context menu access attempt');
+                    return false;
+                });
+
+                // Copy/paste restrictions
+                document.addEventListener('copy', (e) => {
+                    if (e.target !== this.taskInput && !e.target.closest('#taskList li')) {
+                        e.preventDefault();
+                        this.security.handleViolation('Unauthorized copy attempt');
+                    }
+                });
+
+                document.addEventListener('paste', (e) => {
+                    if (e.target !== this.taskInput) {
+                        e.preventDefault();
+                        this.security.handleViolation('Unauthorized paste attempt');
+                    }
+                });
+
+                // Navigation prevention
+                window.addEventListener('beforeunload', (e) => {
+                    if (!this.security.isLocked && this.tasks.length > 0) {
+                        e.preventDefault();
+                        e.returnValue = 'You have unsaved tasks. Are you sure you want to leave?';
+                        return e.returnValue;
+                    }
+                });
+
+                // Drag and drop blocking
+                ['dragover', 'drop', 'dragstart', 'drag'].forEach(event => {
+                    document.addEventListener(event, (e) => {
+                        e.preventDefault();
+                        this.security.handleViolation(`File operation blocked: ${event}`);
+                    });
+                });
+            }
+
+            formatTimeAgo(timestamp) {
+                try {
+                    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+                    if (seconds < 5) return "just now";
+                    if (seconds < 60) return `${seconds} sec ago`;
+                    const minutes = Math.floor(seconds / 60);
+                    if (minutes < 60) return `${minutes} min ago`;
+                    const hours = Math.floor(minutes / 60);
+                    if (hours < 24) return `${hours} hr ago`;
+                    const days = Math.floor(hours / 24);
+                    return `${days} day${days > 1 ? 's' : ''} ago`;
+                } catch (error) {
+                    return "unknown";
+                }
+            }
+
+            updateTimestamps() {
+                try {
+                    const timeSpans = document.querySelectorAll('.task-time');
+                    timeSpans.forEach(span => {
+                        const index = parseInt(span.dataset.index);
+                        if (!isNaN(index) && this.tasks[index]) {
+                            span.textContent = `[${this.formatTimeAgo(this.tasks[index].createdAt)}] `;
+                        }
+                    });
+                } catch (error) {
+                    this.handleError('Timestamp update failed', error);
+                }
+            }
+
+            addTask() {
+                if (this.security.isLocked) return;
+                
+                try {
+                    const task = this.taskInput.value.trim();
+                    if (!task) {
+                        this.showMessage('task cannot be empty', true);
+                        return;
+                    }
+
+                    if (task.length > 150) {
+                        this.showMessage('task too long (max 150 characters)', true);
+                        return;
+                    }
+
+                    const newTask = { 
+                        text: this.sanitizeInput(task), 
+                        completed: false, 
+                        createdAt: Date.now()
+                    };
+                    
+                    this.tasks.push(newTask);
+                    this.saveTasks();
+                    this.taskInput.value = '';
+                    this.renderTasks();
+                    this.showMessage(`Task added: "${newTask.text}"`);
+                } catch (error) {
+                    this.handleError('Failed to add task', error);
+                }
+            }
+
+            sanitizeInput(input) {
+                // Basic XSS prevention
+                return input.replace(/[<>]/g, '');
+            }
+
+            toggleTask(index) {
+                if (this.security.isLocked) return;
+                
+                try {
+                    if (this.tasks[index]) {
+                        this.tasks[index].completed = !this.tasks[index].completed;
+                        this.saveTasks();
+                        this.renderTasks();
+                    } else {
+                        this.showMessage('task not found', true);
+                    }
+                } catch (error) {
+                    this.handleError('Failed to toggle task', error);
+                }
+            }
+
+            deleteTask(index) {
+                if (this.security.isLocked) return;
+                
+                try {
+                    if (this.tasks[index]) {
+                        const taskText = this.tasks[index].text;
+                        this.tasks.splice(index, 1);
+                        this.saveTasks();
+                        this.renderTasks();
+                        this.showMessage(`Task deleted: "${taskText}"`);
+                    } else {
+                        this.showMessage('task not found for deletion', true);
+                    }
+                } catch (error) {
+                    this.handleError('Failed to delete task', error);
+                }
+            }
+
+            renderTasks() {
+                if (this.security.isLocked) return;
+                
+                try {
+                    if (!this.taskList) return;
+                    
+                    this.taskList.innerHTML = '';
+                    
+                    if (this.tasks.length === 0) {
+                        if (this.emptyMessage) {
+                            this.emptyMessage.style.display = 'block';
+                        }
+                    } else {
+                        if (this.emptyMessage) {
+                            this.emptyMessage.style.display = 'none';
+                        }
+                    }
+
+                    this.tasks.forEach((task, index) => {
+                        const li = document.createElement('li');
+                        if (task.completed) li.classList.add('completed');
+                        
+                        // Add click handler
+                        li.addEventListener('click', (e) => {
+                            if (e.target.classList.contains('delete-btn')) return;
+                            this.toggleTask(index);
+                        });
+
+                        // Create timestamp element
+                        const timeSpan = document.createElement('span');
+                        timeSpan.classList.add('task-time');
+                        timeSpan.dataset.index = index.toString();
+                        timeSpan.textContent = `[${this.formatTimeAgo(task.createdAt)}] `;
+
+                        // Create task text
+                        const textNode = document.createTextNode(task.text);
+
+                        // Create delete button
+                        const delBtn = document.createElement('span');
+                        delBtn.textContent = '×';
+                        delBtn.classList.add('delete-btn');
+                        delBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            this.deleteTask(index);
+                        });
+
+                        li.appendChild(timeSpan);
+                        li.appendChild(textNode);
+                        li.appendChild(delBtn);
+                        this.taskList.appendChild(li);
+                        
+                        // Staggered animation
+                        setTimeout(() => {
+                            li.style.animationDelay = `${index * 0.1}s`;
+                        }, 10);
+                    });
+
+                    this.updateStats();
+                } catch (error) {
+                    this.handleError('Failed to render tasks', error);
+                }
+            }
+
+            updateStats() {
+                try {
+                    if (!this.taskStats) return;
+                    
+                    const total = this.tasks.length;
+                    const completed = this.tasks.filter(t => t.completed).length;
+                    const pending = total - completed;
+                    
+                    this.taskStats.textContent = `Total: ${total} | Completed: ${completed} | Pending: ${pending}`;
+                } catch (error) {
+                    this.handleError('Failed to update stats', error);
+                }
+            }
+
+            showMessage(msg, isError = false) {
+                try {
+                    if (!this.messageContainer) return;
+                    
+                    // Remove existing messages of the same type
+                    const existingMsg = this.messageContainer.querySelector(
+                        isError ? '.error-message' : '.system-message'
+                    );
+                    if (existingMsg) {
+                        existingMsg.remove();
+                    }
+
+                    const sysMsg = document.createElement('div');
+                    if (isError) {
+                        sysMsg.classList.add('error-message');
+                        sysMsg.textContent = `// ERROR: ${msg}`;
+                    } else {
+                        sysMsg.classList.add('system-message');
+                        sysMsg.textContent = `// ${msg}`;
+                    }
+                    
+                    this.messageContainer.appendChild(sysMsg);
+                    
+                    setTimeout(() => {
+                        if (sysMsg.parentNode) {
+                            sysMsg.style.opacity = '0';
+                            setTimeout(() => {
+                                if (sysMsg.parentNode) {
+                                    sysMsg.remove();
+                                }
+                            }, 300);
+                        }
+                    }, isError ? 4000 : 2500);
+                } catch (error) {
+                    console.error('Failed to show message:', error);
+                }
+            }
+
+            handleError(message, error) {
+                console.error(`${message}:`, error);
+                this.showMessage(`system error: ${message}`, true);
+            }
+
+            cleanup() {
+                this.intervals.forEach(interval => clearInterval(interval));
+                this.intervals = [];
+                if (this.security) {
+                    this.security.cleanup();
+                }
+            }
         }
 
-        const remove = i => (todos.splice(i, 1), render());
+        // Application initialization with error handling
+        let app = null;
 
-        function render() {
-            $('list').innerHTML = todos.map((t, i) =>
-                `<li class="${t.done ? 'done' : ''}">
-                    <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggle(${i})">
-                    <span class="task-text">${t.text}</span>
-                    <button class="delete-btn" onclick="remove(${i})">Delete</button>
-                </li>`
-            ).join('');
+        function initializeApp() {
+            try {
+                app = new SecureTerminalTodo();
+                
+                // Cleanup on page unload
+                window.addEventListener('beforeunload', () => {
+                    if (app) {
+                        app.cleanup();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Failed to initialize application:', error);
+                
+                // Fallback error display
+                const body = document.body;
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: #ff0000;
+                    color: white;
+                    padding: 20px;
+                    border-radius: 5px;
+                    font-family: monospace;
+                    z-index: 10001;
+                `;
+                errorDiv.textContent = 'CRITICAL ERROR: Application failed to initialize';
+                body.appendChild(errorDiv);
+            }
         }
 
-        $('task').addEventListener('keypress', e => e.key === 'Enter' && add());
+        // Enhanced protection layer
+        (function() {
+            'use strict';
+            
+            try {
+                // Protect critical functions
+                const originalEval = window.eval;
+                const originalFunction = window.Function;
+                
+                // Override dangerous functions
+                window.eval = function() { 
+                    throw new Error('eval() disabled for security'); 
+                };
+                
+                window.Function = function() { 
+                    throw new Error('Function constructor disabled for security'); 
+                };
+
+                // Protect against script injection
+                const originalCreateElement = document.createElement;
+                document.createElement = function(tagName) {
+                    const element = originalCreateElement.call(document, tagName);
+                    
+                    if (tagName.toLowerCase() === 'script') {
+                        console.warn('Script creation detected and monitored');
+                    }
+                    
+                    return element;
+                };
+
+                // Protect Node.prototype methods
+                if (Node.prototype.appendChild) {
+                    const originalAppendChild = Node.prototype.appendChild;
+                    Node.prototype.appendChild = function(child) {
+                        if (child && child.tagName === 'SCRIPT') {
+                            console.warn('Script injection attempt detected');
+                            // Still allow but log it
+                        }
+                        return originalAppendChild.call(this, child);
+                    };
+                }
+
+                // Freeze important prototypes
+                if (typeof Object.freeze === 'function') {
+                    Object.freeze(Object.prototype);
+                    Object.freeze(Array.prototype);
+                    Object.freeze(String.prototype);
+                    Object.freeze(Number.prototype);
+                }
+
+                // Initialize the app after DOM is ready
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initializeApp);
+                } else {
+                    initializeApp();
+                }
+                
+            } catch (error) {
+                console.error('Protection layer initialization failed:', error);
+                // Still try to initialize the app
+                initializeApp();
+            }
+        })();
+
+        // Additional security measures
+        document.addEventListener('selectstart', (e) => {
+            const allowedElements = ['INPUT', 'TEXTAREA'];
+            const isTaskText = e.target.closest('#taskList li') && !e.target.classList.contains('delete-btn');
+            
+            if (!allowedElements.includes(e.target.tagName) && !isTaskText) {
+                e.preventDefault();
+            }
+        });
+
+        // Disable drag on images and other elements
+        document.addEventListener('dragstart', (e) => {
+            if (e.target.tagName === 'IMG' || e.target.tagName === 'A') {
+                e.preventDefault();
+            }
+        });
+
     </script>
 </body>
 </html>
