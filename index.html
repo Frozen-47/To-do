@@ -519,42 +519,7 @@
     </style>
 </head>
 <body>
-    <div class="lockdown-overlay" id="lockdownOverlay">
-        <div class="lockdown-content">
-            <div class="lockdown-header">⚠ SECURITY PROTOCOL ACTIVATED ⚠</div>
-            <div class="lockdown-code">ERROR CODE: SEC-001-BREACH</div>
-            
-            <div class="lockdown-terminal">
-                <div>$ system_scan --deep --security</div>
-                <div style="color: #ff6666;">THREAT DETECTED: Unauthorized access attempt</div>
-                <div style="color: #ff6666;">RESPONSE: Initiating containment protocol</div>
-                <div>$ lockdown --immediate --secure-wipe</div>
-                <div class="lockdown-scan"></div>
-                <div style="color: #ff9999;">STATUS: All data secured and encrypted</div>
-                <div style="color: #ff9999;">STATUS: Session terminated for security</div>
-            </div>
-
-            <div class="lockdown-details">
-                <strong>SECURITY INCIDENT REPORT:</strong><br>
-                • Suspicious activity detected in terminal session<br>
-                • Multiple security violations recorded<br>
-                • Potential tampering or unauthorized access attempt<br>
-                • All sensitive data has been secured and encrypted<br>
-                • Session logs have been preserved for analysis<br><br>
-                
-                <strong>NEXT STEPS:</strong><br>
-                • Refresh the page to start a new secure session<br>
-                • Ensure you are in a trusted environment<br>
-                • Avoid using developer tools or debugging features<br>
-                • Contact system administrator if this was unexpected
-            </div>
-
-            <div class="lockdown-timestamp" id="lockdownTime">
-                Incident Time: Loading...
-            </div>
-        </div>
-    </div>
-
+  
     <div class="terminal">
         <div class="terminal-header">
             <div class="terminal-dots">
@@ -562,12 +527,12 @@
                 <div class="dot yellow"></div>
                 <div class="dot green"></div>
             </div>
-            <div class="terminal-title">secure-todo.exe</div>
+            <div class="terminal-title">todo.exe</div>
         </div>
         
         <div class="terminal-body">
             <div class="prompt">
-                SECURE TASK MANAGER v4.7
+                TASK MANAGER v4.7
                 <span class="cursor" id="cursor"></span>
             </div>
             
@@ -580,7 +545,7 @@
                     <span class="command">[enter] add task</span>
                     <span class="command">[click] toggle</span>
                     <span class="command">[×] delete</span>
-                    <span class="command">[tamper detection active]</span>
+                    
                 </div>
             </div>
 
@@ -601,412 +566,30 @@
         <div id="taskStats">Total: 0 | Completed: 0 | Pending: 0</div>
         <div style="font-size: 0.7rem; color: #444; margin-top: 5px;" id="securityStatus">Security: Active</div>
     </div>
-
     <script>
-        // Enhanced Security Manager - Optimized and Fixed
-        class SecurityManager {
-            constructor() {
-                this.violations = 0;
-                this.maxViolations = 3;
-                this.isLocked = false;
-                this.intervals = [];
-                this.observers = [];
-                this.startTime = Date.now();
-                this.initSecurity();
-            }
-
-            initSecurity() {
-                try {
-                    this.setupAntiDebug();
-                    this.setupTamperDetection();
-                    this.setupAdvancedDetection();
-                    this.obfuscateStorage();
-                    this.logSecurityEvent('Security manager initialized');
-                } catch (error) {
-                    this.logSecurityEvent('Security initialization failed', error);
-                }
-            }
-
-            setupAntiDebug() {
-                // Optimized debugger detection with reduced frequency
-                const debugInterval = setInterval(() => {
-                    if (this.isLocked) return;
-                    
-                    try {
-                        const start = performance.now();
-                        eval('debugger');
-                        const timeTaken = performance.now() - start;
-                        
-                        // Only flag if significantly delayed (more lenient)
-                        if (timeTaken > 200) {
-                            this.handleViolation('Debugger timing anomaly detected');
-                        }
-                    } catch (e) {
-                        // Silent fail
-                    }
-                }, 3000); // Reduced frequency
-                
-                this.intervals.push(debugInterval);
-
-                // DevTools size detection - improved logic
-                let lastCheck = { width: window.innerWidth, height: window.innerHeight };
-                
-                const sizeInterval = setInterval(() => {
-                    if (this.isLocked) return;
-                    
-                    const current = { width: window.innerWidth, height: window.innerHeight };
-                    const widthDiff = Math.abs(current.width - lastCheck.width);
-                    const heightDiff = Math.abs(current.height - lastCheck.height);
-                    
-                    // More sophisticated detection
-                    if ((widthDiff > 300 || heightDiff > 300) && 
-                        (current.width < lastCheck.width || current.height < lastCheck.height)) {
-                        this.handleViolation('DevTools size change detected');
-                    }
-                    
-                    lastCheck = current;
-                }, 1000);
-                
-                this.intervals.push(sizeInterval);
-            }
-
-            setupTamperDetection() {
-                // DOM mutation observer with intelligent filtering
-                if (typeof MutationObserver !== 'undefined') {
-                    const observer = new MutationObserver((mutations) => {
-                        let significantChanges = 0;
-                        
-                        mutations.forEach((mutation) => {
-                            // Filter out minor changes (like text content updates)
-                            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                                mutation.addedNodes.forEach(node => {
-                                    if (node.nodeType === Node.ELEMENT_NODE) {
-                                        const tagName = node.tagName;
-                                        if (tagName === 'SCRIPT' || tagName === 'IFRAME' || tagName === 'EMBED') {
-                                            significantChanges++;
-                                        }
-                                    }
-                                });
-                            }
-                            
-                            if (mutation.type === 'attributes' && 
-                                ['onclick', 'onload', 'onerror'].includes(mutation.attributeName)) {
-                                significantChanges++;
-                            }
-                        });
-                        
-                        if (significantChanges > 0) {
-                            this.handleViolation(`DOM tampering: ${significantChanges} suspicious changes`);
-                        }
-                    });
-
-                    observer.observe(document.documentElement, {
-                        childList: true,
-                        subtree: true,
-                        attributes: true,
-                        attributeFilter: ['onclick', 'onload', 'onerror', 'src', 'href']
-                    });
-                    
-                    this.observers.push(observer);
-                }
-
-                // Script count monitoring - improved
-                const initialScriptCount = document.querySelectorAll('script').length;
-                const scriptInterval = setInterval(() => {
-                    if (this.isLocked) return;
-                    
-                    const currentScriptCount = document.querySelectorAll('script').length;
-                    if (currentScriptCount > initialScriptCount) {
-                        this.handleViolation('Unauthorized script injection detected');
-                    }
-                }, 2000);
-                
-                this.intervals.push(scriptInterval);
-            }
-
-            setupAdvancedDetection() {
-                // Global object monitoring - improved
-                const initialGlobals = new Set(Object.getOwnPropertyNames(window));
-                
-                const globalInterval = setInterval(() => {
-                    if (this.isLocked) return;
-                    
-                    const currentGlobals = new Set(Object.getOwnPropertyNames(window));
-                    const newGlobals = [...currentGlobals].filter(name => 
-                        !initialGlobals.has(name) && 
-                        !name.startsWith('webkit') && // Browser-specific properties
-                        !name.startsWith('moz') &&
-                        name !== 'chrome' // Chrome extensions
-                    );
-                    
-                    if (newGlobals.length > 0) {
-                        this.handleViolation(`Global pollution: ${newGlobals.join(', ')}`);
-                    }
-                }, 5000); // Less frequent
-                
-                this.intervals.push(globalInterval);
-
-                // Message monitoring
-                const messageHandler = (event) => {
-                    // Allow same-origin messages
-                    if (event.origin === window.location.origin) return;
-                    this.handleViolation(`Cross-origin message: ${event.origin}`);
-                };
-                
-                window.addEventListener('message', messageHandler);
-
-                // Performance monitoring - more balanced
-                const perfInterval = setInterval(() => {
-                    if (this.isLocked) return;
-                    
-                    const start = performance.now();
-                    // Light computation instead of heavy loop
-                    for (let i = 0; i < 100; i++) {
-                        Math.random();
-                    }
-                    const duration = performance.now() - start;
-                    
-                    if (duration > 50) { // More reasonable threshold
-                        this.handleViolation('Performance profiling detected');
-                    }
-                }, 10000); // Much less frequent
-                
-                this.intervals.push(perfInterval);
-            }
-
-            obfuscateStorage() {
-                // Enhanced storage obfuscation
-                this.storageKey = btoa(Math.random().toString(36) + Date.now()).substr(0, 16);
-                this.encryptionKey = Array.from({length: 16}, () => 
-                    String.fromCharCode(33 + Math.random() * 94)).join('');
-            }
-
-            encryptData(data) {
-                try {
-                    const str = JSON.stringify(data);
-                    let result = '';
-                    for (let i = 0; i < str.length; i++) {
-                        const keyChar = this.encryptionKey.charCodeAt(i % this.encryptionKey.length);
-                        result += String.fromCharCode(str.charCodeAt(i) ^ keyChar);
-                    }
-                    return btoa(result);
-                } catch (error) {
-                    this.logSecurityEvent('Encryption failed', error);
-                    return btoa(JSON.stringify(data)); // Fallback
-                }
-            }
-
-            decryptData(encryptedData) {
-                try {
-                    const str = atob(encryptedData);
-                    let result = '';
-                    for (let i = 0; i < str.length; i++) {
-                        const keyChar = this.encryptionKey.charCodeAt(i % this.encryptionKey.length);
-                        result += String.fromCharCode(str.charCodeAt(i) ^ keyChar);
-                    }
-                    return JSON.parse(result);
-                } catch (error) {
-                    this.logSecurityEvent('Decryption failed', error);
-                    return [];
-                }
-            }
-
-            handleViolation(reason) {
-                this.violations++;
-                this.logSecurityEvent(`Violation ${this.violations}/${this.maxViolations}: ${reason}`);
-                
-                const securityStatus = document.getElementById('securityStatus');
-                if (securityStatus) {
-                    securityStatus.textContent = `Security: ${this.violations} violations`;
-                    securityStatus.style.color = this.violations >= this.maxViolations ? '#ff0000' : '#ff6b6b';
-                }
-
-                if (this.violations >= this.maxViolations) {
-                    this.lockdown(reason);
-                } else {
-                    this.showSecurityWarning(reason);
-                }
-            }
-
-            showSecurityWarning(reason) {
-                const messageContainer = document.getElementById('messageContainer');
-                if (messageContainer) {
-                    // Remove existing warnings
-                    const existing = messageContainer.querySelector('.security-warning');
-                    if (existing) existing.remove();
-                    
-                    const warning = document.createElement('div');
-                    warning.classList.add('security-warning');
-                    warning.textContent = `SECURITY ALERT: ${reason} (${this.violations}/${this.maxViolations})`;
-                    messageContainer.appendChild(warning);
-
-                    setTimeout(() => {
-                        if (warning.parentNode) {
-                            warning.remove();
-                        }
-                    }, 4000);
-                }
-            }
-
-            lockdown(reason) {
-                this.isLocked = true;
-                this.logSecurityEvent(`LOCKDOWN INITIATED: ${reason}`);
-                
-                // Clear all intervals and observers
-                this.intervals.forEach(interval => clearInterval(interval));
-                this.observers.forEach(observer => observer.disconnect());
-                
-                const overlay = document.getElementById('lockdownOverlay');
-                const terminal = document.querySelector('.terminal');
-                const timeElement = document.getElementById('lockdownTime');
-                
-                if (overlay && terminal) {
-                    // Update timestamp
-                    if (timeElement) {
-                        const now = new Date();
-                        timeElement.textContent = `Incident Time: ${now.toLocaleString()} (UTC${now.getTimezoneOffset() > 0 ? '-' : '+'}${Math.abs(now.getTimezoneOffset()/60)})`;
-                    }
-
-                    // Show lockdown screen
-                    overlay.style.display = 'flex';
-                    terminal.classList.add('obfuscated');
-                    
-                    // Add dramatic sound effect simulation
-                    this.simulateAlarmSound();
-                    
-                    // Clear storage securely with progressive wipe
-                    this.secureDataWipe();
-                    
-                    // Disable all interactions
-                    document.body.style.pointerEvents = 'none';
-                    document.body.style.userSelect = 'none';
-                    
-                    // Prevent any recovery attempts
-                    this.preventRecovery();
-                }
-            }
-
-            simulateAlarmSound() {
-                // Visual alarm simulation since we can't play actual sounds
-                let flashCount = 0;
-                const flashInterval = setInterval(() => {
-                    document.body.style.backgroundColor = flashCount % 2 === 0 ? '#330000' : '#000000';
-                    flashCount++;
-                    if (flashCount >= 10) {
-                        clearInterval(flashInterval);
-                        document.body.style.backgroundColor = '#000000';
-                    }
-                }, 200);
-            }
-
-            secureDataWipe() {
-                try {
-                    // Progressive data clearing with visual feedback
-                    const steps = [
-                        'Encrypting sensitive data...',
-                        'Clearing application memory...',
-                        'Wiping temporary storage...',
-                        'Securing session logs...',
-                        'Data protection complete.'
-                    ];
-
-                    const terminalDiv = document.querySelector('.lockdown-terminal');
-                    if (terminalDiv) {
-                        steps.forEach((step, index) => {
-                            setTimeout(() => {
-                                const stepDiv = document.createElement('div');
-                                stepDiv.style.color = '#ff9999';
-                                stepDiv.textContent = `$ ${step}`;
-                                terminalDiv.appendChild(stepDiv);
-                            }, index * 1000);
-                        });
-                    }
-
-                    // Actually clear storage
-                    setTimeout(() => {
-                        if (typeof Storage !== 'undefined') {
-                            localStorage.clear();
-                            sessionStorage.clear();
-                        }
-                        
-                        // Clear any cached data
-                        if ('caches' in window) {
-                            caches.keys().then(names => {
-                                names.forEach(name => caches.delete(name));
-                            });
-                        }
-                    }, 2000);
-                } catch (e) {
-                    // Silent fail
-                }
-            }
-
-            preventRecovery() {
-                // Override critical functions to prevent recovery
-                window.location.reload = () => {
-                    console.log('Reload blocked - security protocol active');
-                };
-                
-                // Block console commands
-                const originalLog = console.log;
-                console.log = (...args) => {
-                    return originalLog('SECURITY: Console access restricted');
-                };
-                
-                // Block navigation
-                window.addEventListener('popstate', (e) => {
-                    e.preventDefault();
-                    history.pushState(null, null, location.href);
-                });
-            }
-
-            logSecurityEvent(message, error = null) {
-                const timestamp = new Date().toISOString();
-                const logEntry = `[${timestamp}] SECURITY: ${message}`;
-                
-                if (error) {
-                    console.warn(logEntry, error);
-                } else {
-                    console.log(logEntry);
-                }
-            }
-
-            cleanup() {
-                this.intervals.forEach(interval => clearInterval(interval));
-                this.observers.forEach(observer => observer.disconnect());
-                this.intervals = [];
-                this.observers = [];
-            }
-        }
-
-        // Main Task Manager - Enhanced with better error handling
+        // Main Task Manager - Clean version without security
         class SecureTerminalTodo {
             constructor() {
-                try {
-                    this.security = new SecurityManager();
-                    this.tasks = [];
-                    this.initializeStorage();
-                    
-                    this.taskList = document.getElementById('taskList');
-                    this.taskStats = document.getElementById('taskStats');
-                    this.taskInput = document.getElementById('taskInput');
-                    this.cursor = document.getElementById('cursor');
-                    this.emptyMessage = document.getElementById('emptyMessage');
-                    this.messageContainer = document.getElementById('messageContainer');
-                    
-                    this.intervals = [];
-                    this.init();
-                } catch (error) {
-                    this.handleError('Initialization failed', error);
-                }
+                this.tasks = [];
+                this.initializeStorage();
+                
+                this.taskList = document.getElementById('taskList');
+                this.taskStats = document.getElementById('taskStats');
+                this.taskInput = document.getElementById('taskInput');
+                this.cursor = document.getElementById('cursor');
+                this.emptyMessage = document.getElementById('emptyMessage');
+                this.messageContainer = document.getElementById('messageContainer');
+                
+                this.intervals = [];
+                this.init();
             }
 
             initializeStorage() {
                 try {
                     if (typeof Storage !== 'undefined') {
-                        const encrypted = localStorage.getItem(this.security.storageKey);
-                        if (encrypted) {
-                            this.tasks = this.security.decryptData(encrypted);
+                        const saved = localStorage.getItem('secure-todo-tasks');
+                        if (saved) {
+                            this.tasks = JSON.parse(saved);
                         }
                         
                         // Ensure tasks have proper structure
@@ -1017,56 +600,37 @@
                         }));
                     }
                 } catch (error) {
-                    this.handleError('Storage initialization failed', error);
+                    console.warn('Storage initialization failed:', error);
                     this.tasks = [];
                 }
             }
 
             saveTasks() {
-                if (this.security.isLocked) return;
-                
                 try {
                     if (typeof Storage !== 'undefined') {
-                        const encrypted = this.security.encryptData(this.tasks);
-                        localStorage.setItem(this.security.storageKey, encrypted);
+                        localStorage.setItem('secure-todo-tasks', JSON.stringify(this.tasks));
                     }
                 } catch (error) {
-                    this.handleError('Failed to save tasks', error);
+                    console.warn('Failed to save tasks:', error);
+                    this.showMessage('Failed to save tasks', true);
                 }
             }
 
             init() {
-                if (this.security.isLocked) return;
-                
-                try {
-                    this.renderTasks();
-                    this.setupEventListeners();
-                    this.startIntervals();
-                    this.setupSecurityHandlers();
-                    this.showMessage('secure system ready. tamper detection active.');
-                } catch (error) {
-                    this.handleError('App initialization failed', error);
-                }
+                this.renderTasks();
+                this.setupEventListeners();
+                this.startIntervals();
+                this.showMessage('secure system ready.');
             }
 
             setupEventListeners() {
-                // Input handling with better error management
                 this.taskInput.addEventListener('keydown', (e) => {
-                    if (this.security.isLocked) {
+                    if (e.key === 'Enter') {
+                        this.addTask();
+                    } else if (e.ctrlKey && e.key === 'c') {
                         e.preventDefault();
-                        return;
-                    }
-                    
-                    try {
-                        if (e.key === 'Enter') {
-                            this.addTask();
-                        } else if (e.ctrlKey && e.key === 'c') {
-                            e.preventDefault();
-                            this.taskInput.value = '';
-                            this.showMessage('input cleared.');
-                        }
-                    } catch (error) {
-                        this.handleError('Input handling failed', error);
+                        this.taskInput.value = '';
+                        this.showMessage('input cleared.');
                     }
                 });
 
@@ -1081,7 +645,7 @@
             startIntervals() {
                 // Cursor blinking
                 const cursorInterval = setInterval(() => {
-                    if (!this.security.isLocked && this.cursor) {
+                    if (this.cursor) {
                         this.cursor.classList.toggle('hidden');
                     }
                 }, 500);
@@ -1089,91 +653,9 @@
 
                 // Timestamp updates
                 const timestampInterval = setInterval(() => {
-                    if (!this.security.isLocked) {
-                        this.updateTimestamps();
-                    }
+                    this.updateTimestamps();
                 }, 1000);
                 this.intervals.push(timestampInterval);
-            }
-
-            setupSecurityHandlers() {
-                const blockedKeys = [
-                    { key: 'F12' },
-                    { key: 'F11' },
-                    { key: 'F5' },
-                    { key: 'u', ctrl: true },
-                    { key: 'r', ctrl: true },
-                    { key: 's', ctrl: true },
-                    { key: 'I', ctrl: true, shift: true },
-                    { key: 'J', ctrl: true, shift: true },
-                    { key: 'C', ctrl: true, shift: true },
-                    { key: 'K', ctrl: true, shift: true },
-                    { key: 'E', ctrl: true, shift: true },
-                    { key: 'R', ctrl: true, shift: true },
-                    { key: 'F4', alt: true }
-                ];
-
-                document.addEventListener('keydown', (e) => {
-                    if (this.security.isLocked) {
-                        e.preventDefault();
-                        return false;
-                    }
-
-                    const isBlocked = blockedKeys.some(blocked => {
-                        const keyMatch = e.key === blocked.key;
-                        const ctrlMatch = !blocked.ctrl || e.ctrlKey;
-                        const shiftMatch = !blocked.shift || e.shiftKey;
-                        const altMatch = !blocked.alt || e.altKey;
-                        
-                        return keyMatch && ctrlMatch && shiftMatch && altMatch;
-                    });
-
-                    if (isBlocked) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        this.security.handleViolation(`Blocked key combination: ${e.key}`);
-                        return false;
-                    }
-                });
-
-                // Context menu blocking
-                document.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    this.security.handleViolation('Context menu access attempt');
-                    return false;
-                });
-
-                // Copy/paste restrictions
-                document.addEventListener('copy', (e) => {
-                    if (e.target !== this.taskInput && !e.target.closest('#taskList li')) {
-                        e.preventDefault();
-                        this.security.handleViolation('Unauthorized copy attempt');
-                    }
-                });
-
-                document.addEventListener('paste', (e) => {
-                    if (e.target !== this.taskInput) {
-                        e.preventDefault();
-                        this.security.handleViolation('Unauthorized paste attempt');
-                    }
-                });
-
-                // Navigation prevention
-                window.addEventListener('beforeunload', (e) => {
-                    if (!this.security.isLocked && this.tasks.length > 0) {
-                        e.preventDefault();
-                        e.returnValue = 'You have unsaved tasks. Are you sure you want to leave?';
-                        return e.returnValue;
-                    }
-                });
-
-                // Drag and drop blocking
-                ['dragover', 'drop', 'dragstart', 'drag'].forEach(event => {
-                    document.addEventListener(event, (e) => {
-                        e.preventDefault();
-                        this.security.handleViolation(`File operation blocked: ${event}`);
-                    });
-                });
             }
 
             formatTimeAgo(timestamp) {
@@ -1202,13 +684,11 @@
                         }
                     });
                 } catch (error) {
-                    this.handleError('Timestamp update failed', error);
+                    console.warn('Timestamp update failed:', error);
                 }
             }
 
             addTask() {
-                if (this.security.isLocked) return;
-                
                 try {
                     const task = this.taskInput.value.trim();
                     if (!task) {
@@ -1233,7 +713,8 @@
                     this.renderTasks();
                     this.showMessage(`Task added: "${newTask.text}"`);
                 } catch (error) {
-                    this.handleError('Failed to add task', error);
+                    console.error('Failed to add task:', error);
+                    this.showMessage('Failed to add task', true);
                 }
             }
 
@@ -1243,8 +724,6 @@
             }
 
             toggleTask(index) {
-                if (this.security.isLocked) return;
-                
                 try {
                     if (this.tasks[index]) {
                         this.tasks[index].completed = !this.tasks[index].completed;
@@ -1254,13 +733,11 @@
                         this.showMessage('task not found', true);
                     }
                 } catch (error) {
-                    this.handleError('Failed to toggle task', error);
+                    console.error('Failed to toggle task:', error);
                 }
             }
 
             deleteTask(index) {
-                if (this.security.isLocked) return;
-                
                 try {
                     if (this.tasks[index]) {
                         const taskText = this.tasks[index].text;
@@ -1272,13 +749,11 @@
                         this.showMessage('task not found for deletion', true);
                     }
                 } catch (error) {
-                    this.handleError('Failed to delete task', error);
+                    console.error('Failed to delete task:', error);
                 }
             }
 
             renderTasks() {
-                if (this.security.isLocked) return;
-                
                 try {
                     if (!this.taskList) return;
                     
@@ -1335,7 +810,7 @@
 
                     this.updateStats();
                 } catch (error) {
-                    this.handleError('Failed to render tasks', error);
+                    console.error('Failed to render tasks:', error);
                 }
             }
 
@@ -1349,7 +824,7 @@
                     
                     this.taskStats.textContent = `Total: ${total} | Completed: ${completed} | Pending: ${pending}`;
                 } catch (error) {
-                    this.handleError('Failed to update stats', error);
+                    console.error('Failed to update stats:', error);
                 }
             }
 
@@ -1391,21 +866,13 @@
                 }
             }
 
-            handleError(message, error) {
-                console.error(`${message}:`, error);
-                this.showMessage(`system error: ${message}`, true);
-            }
-
             cleanup() {
                 this.intervals.forEach(interval => clearInterval(interval));
                 this.intervals = [];
-                if (this.security) {
-                    this.security.cleanup();
-                }
             }
         }
 
-        // Application initialization with error handling
+        // Application initialization
         let app = null;
 
         function initializeApp() {
@@ -1421,108 +888,16 @@
                 
             } catch (error) {
                 console.error('Failed to initialize application:', error);
-                
-                // Fallback error display
-                const body = document.body;
-                const errorDiv = document.createElement('div');
-                errorDiv.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: #ff0000;
-                    color: white;
-                    padding: 20px;
-                    border-radius: 5px;
-                    font-family: monospace;
-                    z-index: 10001;
-                `;
-                errorDiv.textContent = 'CRITICAL ERROR: Application failed to initialize';
-                body.appendChild(errorDiv);
             }
         }
 
-        // Enhanced protection layer
-        (function() {
-            'use strict';
-            
-            try {
-                // Protect critical functions
-                const originalEval = window.eval;
-                const originalFunction = window.Function;
-                
-                // Override dangerous functions
-                window.eval = function() { 
-                    throw new Error('eval() disabled for security'); 
-                };
-                
-                window.Function = function() { 
-                    throw new Error('Function constructor disabled for security'); 
-                };
-
-                // Protect against script injection
-                const originalCreateElement = document.createElement;
-                document.createElement = function(tagName) {
-                    const element = originalCreateElement.call(document, tagName);
-                    
-                    if (tagName.toLowerCase() === 'script') {
-                        console.warn('Script creation detected and monitored');
-                    }
-                    
-                    return element;
-                };
-
-                // Protect Node.prototype methods
-                if (Node.prototype.appendChild) {
-                    const originalAppendChild = Node.prototype.appendChild;
-                    Node.prototype.appendChild = function(child) {
-                        if (child && child.tagName === 'SCRIPT') {
-                            console.warn('Script injection attempt detected');
-                            // Still allow but log it
-                        }
-                        return originalAppendChild.call(this, child);
-                    };
-                }
-
-                // Freeze important prototypes
-                if (typeof Object.freeze === 'function') {
-                    Object.freeze(Object.prototype);
-                    Object.freeze(Array.prototype);
-                    Object.freeze(String.prototype);
-                    Object.freeze(Number.prototype);
-                }
-
-                // Initialize the app after DOM is ready
-                if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', initializeApp);
-                } else {
-                    initializeApp();
-                }
-                
-            } catch (error) {
-                console.error('Protection layer initialization failed:', error);
-                // Still try to initialize the app
-                initializeApp();
-            }
-        })();
-
-        // Additional security measures
-        document.addEventListener('selectstart', (e) => {
-            const allowedElements = ['INPUT', 'TEXTAREA'];
-            const isTaskText = e.target.closest('#taskList li') && !e.target.classList.contains('delete-btn');
-            
-            if (!allowedElements.includes(e.target.tagName) && !isTaskText) {
-                e.preventDefault();
-            }
-        });
-
-        // Disable drag on images and other elements
-        document.addEventListener('dragstart', (e) => {
-            if (e.target.tagName === 'IMG' || e.target.tagName === 'A') {
-                e.preventDefault();
-            }
-        });
-
+        // Initialize the app after DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
     </script>
-</body>
+
+ </body>
 </html>
