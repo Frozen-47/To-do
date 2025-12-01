@@ -13,7 +13,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     padding: 40px 20px;
     line-height: 1.4;
@@ -278,6 +278,10 @@ body {
     backdrop-filter: blur(10px);
     font-family: 'JetBrains Mono', monospace;
     margin-top: 20px;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .empty-message {
@@ -313,6 +317,7 @@ body {
 @media (max-width: 768px) {
     body {
         padding: 15px 10px;
+        justify-content: center;
     }
     
     .terminal {
@@ -419,6 +424,10 @@ body {
         margin-top: 15px;
         padding: 12px 15px;
         font-size: 0.75rem;
+        max-width: calc(100% - 20px);
+        left: 10px;
+        right: 10px;
+        transform: none;
     }
 
     .empty-message {
