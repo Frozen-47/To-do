@@ -268,7 +268,7 @@ body {
 }
 
 .stats {
-    width: 100%;
+    width: auto;
     max-width: 700px;
     background: rgba(0, 0, 0, 0.8);
     border: 1px solid #333;
@@ -280,8 +280,7 @@ body {
     margin-top: 20px;
     position: fixed;
     bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
 }
 
 .empty-message {
@@ -425,9 +424,7 @@ body {
         padding: 12px 15px;
         font-size: 0.75rem;
         max-width: calc(100% - 20px);
-        left: 10px;
-        right: 10px;
-        transform: none;
+        left: 0;
     }
 
     .empty-message {
