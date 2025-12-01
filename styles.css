@@ -12,14 +12,13 @@ body {
     color: #fff;
     min-height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
     padding: 40px 20px;
     line-height: 1.4;
     user-select: none;
 }
-
-
 
 .terminal {
     width: 100%;
@@ -269,9 +268,8 @@ body {
 }
 
 .stats {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
+    width: 100%;
+    max-width: 700px;
     background: rgba(0, 0, 0, 0.8);
     border: 1px solid #333;
     padding: 15px 20px;
@@ -279,6 +277,7 @@ body {
     color: #fff;
     backdrop-filter: blur(10px);
     font-family: 'JetBrains Mono', monospace;
+    margin-top: 20px;
 }
 
 .empty-message {
@@ -313,13 +312,11 @@ body {
 
 @media (max-width: 768px) {
     body {
-        padding: 10px;
-        align-items: center;
+        padding: 15px 10px;
     }
     
     .terminal {
         border: 1px solid #333;
-        max-width: 100%;
     }
 
     .terminal-header {
@@ -347,11 +344,10 @@ body {
     .prompt {
         font-size: 1rem;
         margin-bottom: 20px;
-        flex-wrap: wrap;
     }
 
     .input-section {
-        margin-bottom: 30px;
+        margin-bottom: 25px;
         padding-bottom: 20px;
     }
 
@@ -363,19 +359,20 @@ body {
     }
 
     .input-prompt {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
 
     #taskInput {
         width: 100%;
         font-size: 0.95rem;
+        padding: 10px 0;
     }
 
     .commands {
         font-size: 0.75rem;
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 8px;
     }
 
     .command {
@@ -389,26 +386,29 @@ body {
 
     #taskList li {
         gap: 10px;
-        padding: 10px 0;
+        padding: 12px 8px;
         font-size: 0.9rem;
         flex-wrap: wrap;
+        align-items: center;
     }
 
     #taskList li::before {
         margin-top: 0;
+        font-size: 0.9rem;
     }
 
     .task-time {
         font-size: 0.7rem;
-        flex-basis: 100%;
+        width: 100%;
         order: 2;
+        margin-top: 5px;
     }
 
     .delete-btn {
         opacity: 1;
-        position: relative;
-        padding: 5px 10px;
-        font-size: 1.5rem;
+        padding: 8px 12px;
+        font-size: 1.8rem;
+        margin-left: auto;
     }
 
     #taskList li:hover {
@@ -416,9 +416,7 @@ body {
     }
     
     .stats {
-        position: static;
-        margin-top: 20px;
-        width: 100%;
+        margin-top: 15px;
         padding: 12px 15px;
         font-size: 0.75rem;
     }
